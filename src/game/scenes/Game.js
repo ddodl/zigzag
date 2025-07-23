@@ -27,8 +27,14 @@ export class Game extends Scene {
         this.graphics = this.add.graphics();//allows drawing shapes
 
         this.mon = this.children.add(new Minion(this, 30, 100, "totodile", true, this.paths[0]))
+        const b = this.children.add(new Minion(this, 500, 300, "squirtle", false, this.paths[0]))
 
-        // const b = this.physics.add.image(100, 300, "squirtle").setScale(3).setFlipX(true)
+        this.physics.add.collider(this.mon, b, (obj1, obj2) => {
+            obj1.changeState("attacking")
+            obj2.changeState("attacking")
+
+        });
+
         // const s = this.physics.add.image(700, 300, "totodile").setScale(3)
         var homeBase = this.add.rectangle(30, 300, 50, 100, 0x0000ff);
         var enemyBase = this.add.rectangle(770, 300, 50, 100, 0xff0000);
@@ -87,10 +93,12 @@ export class Game extends Scene {
     }
 
     eraseSegment() {
-        if (this.paths[this.pathIndex].length === 1) return//dont erase first point
-        this.paths[this.pathIndex].pop()
-        this.graphics.clear();
-        this.drawPath();
+        if (this.state === "editing") {
+            if (this.paths[this.pathIndex].length === 1) return//dont erase first point
+            this.paths[this.pathIndex].pop()
+            this.graphics.clear();
+            this.drawPath();
+        }
     }
 
     drawPath() {

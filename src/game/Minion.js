@@ -25,18 +25,35 @@ export class Minion extends Phaser.GameObjects.Image {
     }
 
     changeState(state) {
+        if (state === "attacking") {
+            this.body.setVelocity(0, 0)
+            const recoil = 20 * this.f;
+            this.scene.tweens.add({
+                targets: this.imageClone,
+                x: `-=${recoil}`,
+                ease: "sine.out",
+                duration: 300,
+                yoyo: false,
+                repeat: -1,
+            })
+        }
         this.stateText.setText(`state: ${state}`)
         this.state = state;
     }
 
     update() {
-        this.imageClone.copyPosition(this)
         if (this.state === "none") {
+        }
+        if (this.state === "moving") {
+            this.imageClone.copyPosition(this)
+            this.processMove();
+        }
 
-        }
-        if (this.state === "moving") this.processMove();
-        if (this.state === "attacking") {
-        }
+        if (this.state === "attacking") this.processAttack();
+    }
+
+    processAttack() {
+
     }
 
     processMove() {
