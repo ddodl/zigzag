@@ -35,16 +35,24 @@ function App() {
         }
     }
 
+    const go = () => {
+        const scene = phaserRef.current.scene;
+        if (scene) {
+            scene.go()
+        }
+    }
+
     return (
         <div id="app">
             <PhaserGame id="phaserCanvas" ref={phaserRef} />
             <div class="buttonContainer">
-                {[1, 2, 3, 4].map((n, index) => <button className="button" style={{ backgroundColor: editingPath === n - 1 ? "green" : null }}
+                {[1, 2, 3, 4].map((n, index) => <button class="button" style={{ backgroundColor: editingPath === n - 1 ? "green" : null }}
                     onClick={() => editPath(n - 1)} key={index}>edit path {n}</button>
                 )}
             </div>
             <div>
-                <button onClick={erasePath}class="button">erase segment</button>
+                <button onClick={erasePath} class="button">erase segment</button>
+                <button onClick={go} class="button">GOGO!</button>
             </div>
         </div>
     )
