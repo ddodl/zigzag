@@ -71,6 +71,13 @@ export class Game extends Scene {
         this.state = state;
     }
 
+    eraseSegment() {
+        if(this.paths[this.pathIndex].length === 1) return//dont erase first point
+        this.paths[this.pathIndex].pop()
+        this.graphics.clear();
+        this.drawPath();
+    }
+
     drawPath() {
         let p;
         this.paths[this.pathIndex].forEach((point, i) => {

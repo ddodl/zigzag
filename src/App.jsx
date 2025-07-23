@@ -28,6 +28,13 @@ function App() {
         }
     }
 
+    const erasePath = () => {
+        const scene = phaserRef.current.scene;
+        if (scene) {
+            scene.eraseSegment()
+        }
+    }
+
     return (
         <div id="app">
             <PhaserGame id="phaserCanvas" ref={phaserRef} />
@@ -35,6 +42,9 @@ function App() {
                 {[1, 2, 3, 4].map((n, index) => <button className="button" style={{ backgroundColor: editingPath === n - 1 ? "green" : null }}
                     onClick={() => editPath(n - 1)} key={index}>edit path {n}</button>
                 )}
+            </div>
+            <div>
+                <button onClick={erasePath}class="button">erase segment</button>
             </div>
         </div>
     )
