@@ -1,24 +1,30 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 import Phaser from 'phaser';
 import { PhaserGame } from './PhaserGame';
 
 function App() {
 
-    //  References to the PhaserGame component (game and scene are exposed)
+    //References to the PhaserGame component (game and scene are exposed)
     const phaserRef = useRef();
+    const [editingPath, setEditingPath] = useState(null)
 
-    const addSprite = () => {
-
+    const editPath = (editIndex) => {
         const scene = phaserRef.current.scene;
-
         if (scene) {
-            // Add a new sprite to the current scene at a random position
-            const x = Phaser.Math.Between(64, scene.scale.width - 64);
-            const y = Phaser.Math.Between(64, scene.scale.height - 64);
+            if (editingPath === editIndex) {
+                //done editing
+                setEditingPath(null)
+                scene.changeState("none")
+                return
+            }
+            //force user to reset button before editing another
+            if (editingPath === null) {
+                setEditingPath(editIndex)
+                scene.pathIndex = editIndex;//make sure this is before next line
+                scene.changeState("editing")
+            }
 
-            //  `add.sprite` is a Phaser GameObjectFactory method and it returns a Sprite Game Object instance
-            scene.add.sprite(x, y, 'squirtle');
         }
     }
 
@@ -26,12 +32,9 @@ function App() {
         <div id="app">
             <PhaserGame id="phaserCanvas" ref={phaserRef} />
             <div class="buttonContainer">
-                <button className="button" onClick={addSprite}>Add New Sprite</button>
-                <button className="button" onClick={addSprite}>Add New Sprite</button>
-            </div>
-            <div class="buttonContainer">
-                <button className="button" onClick={addSprite}>Add New Sprite</button>
-                <button className="button" onClick={addSprite}>Add New Sprite</button>
+                {[1, 2, 3, 4].map((n, index) => <button className="button" style={{ backgroundColor: editingPath === n - 1 ? "green" : null }}
+                    onClick={() => editPath(n - 1)} key={index}>edit path {n}</button>
+                )}
             </div>
         </div>
     )
