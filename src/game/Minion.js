@@ -1,14 +1,13 @@
 export class Minion extends Phaser.GameObjects.Image {
     imageClone;// this is what gets tweened/animated without affect physics position
-    state = "none";
     goalPoint = 1;
     startPosition;
     health = 100;
     maxHealth = 100;
     currentOpps;
     lastAttackTime = null;
-    aspd = 500;
-    dmg = 5;
+    aspd = Phaser.Math.Between(100, 1000);
+    dmg = Phaser.Math.Between(5, 20);
     attackTween;
 
     constructor(scene, x, y, texture, isFacingRight, path) {
@@ -26,7 +25,6 @@ export class Minion extends Phaser.GameObjects.Image {
             .existing(this)
             .body.setCircle(8, 8, 7.5)//circle set using trial and error to align
             .setCollideWorldBounds(true)
-            .setBounce(1)
 
 
         this.stateText = scene.add.text(600, 10, "", { fill: "#00ff00" });
@@ -88,7 +86,8 @@ export class Minion extends Phaser.GameObjects.Image {
 
     takeDmg(dmg) {
         this.health -= dmg
-        this.greenBar.setScale(this.health / this.maxHealth)
+        if(this.health < 0) this.health = 0
+        this.greenBar.setScale(this.health / this.maxHealth, 1)
         if (this.health <= 0) this.changeState("defeated")
     }
 

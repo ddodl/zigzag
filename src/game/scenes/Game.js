@@ -27,7 +27,7 @@ export class Game extends Scene {
         this.graphics = this.add.graphics();//allows drawing shapes
 
         this.mon = this.children.add(new Minion(this, 30, 100, "totodile", true, this.paths[0]))
-        this.opps = this.children.add(new Minion(this, 500, 300, "squirtle", false, this.paths[0]))
+        this.opps = this.children.add(new Minion(this, 500, 250, "squirtle", false, this.paths[0]))
 
         this.physics.add.collider(this.mon, this.opps, (obj1, obj2) => {
             obj1.changeState("attacking", obj2)
@@ -78,6 +78,7 @@ export class Game extends Scene {
 
     update(time) {
         this.mon.update(time)
+        this.opps.update(time)
     }
     
     reset() {
