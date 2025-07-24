@@ -15,7 +15,7 @@ export class Game extends Scene {
     }
 
     preload() {
-        this.load.setPath('zigzag/assets');
+        this.load.setPath('./assets');
 
         this.load.image('squirtle', '7.png');
         this.load.image('totodile', '159.png');

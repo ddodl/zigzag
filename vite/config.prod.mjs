@@ -18,7 +18,7 @@ const phasermsg = () => {
 }
 
 export default defineConfig({
-    base: '/zigzag',
+    base: './',
     plugins: [
         react(),
         phasermsg()
