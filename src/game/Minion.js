@@ -1,8 +1,16 @@
 export class Minion extends Phaser.GameObjects.Image {
     imageClone;// this is what gets tweened/animated without affect physics position
-    state = "none"
+    state = "none";
     goalPoint = 1;
-    startPosition
+    startPosition;
+    health = 100;
+    maxHealth = 100;
+    currentOpps;
+    lastAttackTime = null;
+    aspd = 500;
+    dmg = 5;
+    attackTween;
+
     constructor(scene, x, y, texture, isFacingRight, path) {
         super(scene)
 
@@ -17,31 +25,57 @@ export class Minion extends Phaser.GameObjects.Image {
         scene.physics.add
             .existing(this)
             .body.setCircle(8, 8, 7.5)//circle set using trial and error to align
-            .setCollideWorldBounds(true);
+            .setCollideWorldBounds(true)
+            .setBounce(1)
+
 
         this.stateText = scene.add.text(600, 10, "", { fill: "#00ff00" });
         this.changeState("none")
 
+        //hp bars
+        this.redBar = this.scene.add.rectangle(x, y - 50, 30, 4, 0xff0000)
+        this.greenBar = this.scene.add.rectangle(x, y - 50, 30, 4, 0x00ff00)
     }
 
-    changeState(state) {
+    moveHp() {
+        const x = this.x;
+        const y = this.y;
+        const offset = -50
+        this.redBar.x = x;
+        this.greenBar.x = x;
+        this.redBar.y = y + offset
+        this.greenBar.y = y + offset
+    }
+
+    changeState(state, arg = null) {
         if (state === "attacking") {
             this.body.setVelocity(0, 0)
-            const recoil = 20 * this.f;
-            this.scene.tweens.add({
-                targets: this.imageClone,
-                x: `-=${recoil}`,
-                ease: "sine.out",
-                duration: 300,
-                yoyo: false,
-                repeat: -1,
-            })
+            this.playAttackTween()
+            this.currentOpps = arg
+        }
+        if (state === "defeated") {
+            this.attackTween.stop()
+            this.body.setEnable(false)
         }
         this.stateText.setText(`state: ${state}`)
         this.state = state;
     }
 
-    update() {
+    playAttackTween() {
+        //attack animation
+        const recoil = 20 * this.f;
+        this.attackTween = this.scene.tweens.add({
+            targets: this.imageClone,
+            x: `-=${recoil}`,
+            ease: "sine.out",
+            duration: this.aspd,
+            yoyo: false,
+            repeat: -1,
+        })
+    }
+
+    update(time) {
+        this.moveHp()
         if (this.state === "none") {
         }
         if (this.state === "moving") {
@@ -49,18 +83,31 @@ export class Minion extends Phaser.GameObjects.Image {
             this.processMove();
         }
 
-        if (this.state === "attacking") this.processAttack();
+        if (this.state === "attacking") this.processAttack(time);
     }
 
-    processAttack() {
+    takeDmg(dmg) {
+        this.health -= dmg
+        this.greenBar.setScale(this.health / this.maxHealth)
+        if (this.health <= 0) this.changeState("defeated")
+    }
 
+    processAttack(time) {
+        if (time > this.lastAttackTime + this.aspd) {
+            this.currentOpps.takeDmg(this.dmg)
+            this.lastAttackTime = time;
+            if (this.currentOpps.state === "defeated") {
+                this.attackTween.stop();
+                this.changeState("moving")
+            }
+        }
     }
 
     processMove() {
         if (this.goalPoint === this.path.length) {//reached last point
-            this.body.setVelocity(0, 0)//stop velocity
+            this.body.stop()//stop velocity
             this.changeState("none")
-            this.reset()
+            //this.reset()
             return
         }
         const destination = this.path[this.goalPoint]

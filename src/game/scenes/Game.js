@@ -30,8 +30,8 @@ export class Game extends Scene {
         const b = this.children.add(new Minion(this, 500, 300, "squirtle", false, this.paths[0]))
 
         this.physics.add.collider(this.mon, b, (obj1, obj2) => {
-            obj1.changeState("attacking")
-            obj2.changeState("attacking")
+            obj1.changeState("attacking", obj2)
+            obj2.changeState("attacking", obj1)
 
         });
 
@@ -76,8 +76,8 @@ export class Game extends Scene {
         EventBus.emit('current-scene-ready', this);
     }
 
-    update() {
-        this.mon.update()
+    update(time) {
+        this.mon.update(time)
     }
 
     go() {
