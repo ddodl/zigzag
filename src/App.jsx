@@ -42,6 +42,13 @@ function App() {
         }
     }
 
+    const reset = () => {
+        const scene = phaserRef.current.scene;
+        if (scene) {
+            scene.reset()
+        }
+    }
+
     return (
         <div id="app">
             <PhaserGame id="phaserCanvas" ref={phaserRef} />
@@ -53,6 +60,7 @@ function App() {
             <div>
                 <button onClick={erasePath} class="button">erase segment</button>
                 <button onClick={go} class="button">GOGO!</button>
+                <button onClick={reset} class="button">reset</button>
             </div>
         </div>
     )

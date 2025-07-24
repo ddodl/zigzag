@@ -27,9 +27,9 @@ export class Game extends Scene {
         this.graphics = this.add.graphics();//allows drawing shapes
 
         this.mon = this.children.add(new Minion(this, 30, 100, "totodile", true, this.paths[0]))
-        const b = this.children.add(new Minion(this, 500, 300, "squirtle", false, this.paths[0]))
+        this.opps = this.children.add(new Minion(this, 500, 300, "squirtle", false, this.paths[0]))
 
-        this.physics.add.collider(this.mon, b, (obj1, obj2) => {
+        this.physics.add.collider(this.mon, this.opps, (obj1, obj2) => {
             obj1.changeState("attacking", obj2)
             obj2.changeState("attacking", obj1)
 
@@ -78,6 +78,12 @@ export class Game extends Scene {
 
     update(time) {
         this.mon.update(time)
+    }
+    
+    reset() {
+        this.mon.reset()
+        this.opps.health = 100;
+        this.opps.body.setEnable(true)
     }
 
     go() {

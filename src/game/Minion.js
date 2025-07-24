@@ -124,5 +124,6 @@ export class Minion extends Phaser.GameObjects.Image {
     reset() {
         this.goalPoint = 1;
         this.setPosition(this.startPosition.x, this.startPosition.y)
+        this.imageClone.copyPosition(this)
     }
 }
