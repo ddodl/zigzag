@@ -16,7 +16,7 @@ export class Game extends Scene {
 
     preload() {
         this.load.setPath('./assets');
-
+        this.load.image('chikorita', '152.png');
         this.load.image('squirtle', '7.png');
         this.load.image('totodile', '159.png');
         this.load.image('fieldBackground', 'field1.png');
@@ -35,35 +35,16 @@ export class Game extends Scene {
 
         });
 
-        // const s = this.physics.add.image(700, 300, "totodile").setScale(3)
         var homeBase = this.add.rectangle(30, 300, 50, 100, 0x0000ff);
         var enemyBase = this.add.rectangle(770, 300, 50, 100, 0xff0000);
-        // this.physics.add.existing(homeBase)
-        // this.physics.add.existing(enemyBase)
-        // this.add.circle(30, 100, 8, 0x0f0)
-        // this.add.circle(30, 200, 8, 0x0f0)
-        // this.add.circle(30, 400, 8, 0x0f0)
-        // this.add.circle(30, 500, 8, 0x0f0)
-
-        // this.add.circle(55, 300, 8, 0x0f0)
-        // this.add.circle(800 - 55, 300, 8, 0x00ff00)
-
+        
 
         this.physics.add.existing(homeBase)
         this.physics.add.existing(enemyBase)
-
-        // b.setCollideWorldBounds(true);
-        // s.setCollideWorldBounds(true);
-        // b.setVelocity(100, 0)
-        // s.setVelocity(-100, 0)
-        // b.setCircle(10, 25, 35)
-        // s.setCircle(10, 25, 35)
-
-        // this.physics.add.collider(b, s)
+        this.bulletGroup = this.physics.add.group();
 
         this.stateText = this.add.text(10, 10, "", { fill: "#00ff00" });
         this.changeState("none")
-
 
         this.input.on("pointerdown", (pointer, gameObj) => {
             if (gameObj.length > 0) return;//if clicked on another clickable item
@@ -80,7 +61,20 @@ export class Game extends Scene {
         this.mon.update(time)
         this.opps.update(time)
     }
-    
+
+    changeState(state) {
+        if (state === "editing") this.drawPath();
+        if (state === "none") this.graphics.clear();
+        this.stateText.setText(`state: ${state}`)
+        this.state = state;
+    }
+
+    spawnBullet({x1, y1, x2, y2}, bulletSpeed) {
+        const bullet = this.physics.add.sprite(x1, y1, 'chikorita')
+        this.bulletGroup.add(bullet)
+        this.physics.moveTo(bullet, x2, y2, bulletSpeed)
+    }
+
     reset() {
         this.mon.reset()
         this.opps.health = 100;
@@ -89,14 +83,7 @@ export class Game extends Scene {
 
     go() {
         this.changeState("Battle")
-        this.mon.changeState("moving")
-    }
-
-    changeState(state) {
-        if (state === "editing") this.drawPath();
-        if (state === "none") this.graphics.clear();
-        this.stateText.setText(`state: ${state}`)
-        this.state = state;
+        this.mon.changeState("start")
     }
 
     eraseSegment() {

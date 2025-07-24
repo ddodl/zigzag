@@ -1,3 +1,5 @@
+import { calcVertexLines } from "./Vertex";
+
 export class Minion extends Phaser.GameObjects.Image {
     imageClone;// this is what gets tweened/animated without affect physics position
     goalPoint = 1;
@@ -9,6 +11,8 @@ export class Minion extends Phaser.GameObjects.Image {
     aspd = Phaser.Math.Between(100, 1000);
     dmg = Phaser.Math.Between(5, 20);
     attackTween;
+    bulletRange = 100;
+    bulletSpeed = 20;
 
     constructor(scene, x, y, texture, isFacingRight, path) {
         super(scene)
@@ -51,10 +55,17 @@ export class Minion extends Phaser.GameObjects.Image {
             this.playAttackTween()
             this.currentOpps = arg
         }
-        if (state === "defeated") {
+        else if (state === "defeated") {
             this.attackTween.stop()
             this.body.setEnable(false)
         }
+        else if ((state === "start")) {
+            this.vertexLines = calcVertexLines(this.path, this.bulletRange)
+            this.stateText.setText(`state: moving`)
+            this.state = "moving";
+            return
+        }
+
         this.stateText.setText(`state: ${state}`)
         this.state = state;
     }
@@ -86,7 +97,7 @@ export class Minion extends Phaser.GameObjects.Image {
 
     takeDmg(dmg) {
         this.health -= dmg
-        if(this.health < 0) this.health = 0
+        if (this.health < 0) this.health = 0
         this.greenBar.setScale(this.health / this.maxHealth, 1)
         if (this.health <= 0) this.changeState("defeated")
     }
@@ -114,6 +125,8 @@ export class Minion extends Phaser.GameObjects.Image {
         if (dist < 10) {//does the game update fast enough to see 10pixels in distance
             //reached turn point, need new destination
             this.goalPoint += 1;
+            const v = this.vertexLines[this.goalPoint]
+            if (v) this.scene.spawnBullet(v)
         } else {
             //continue to destination
             this.scene.physics.moveTo(this, destination.x, destination.y, 300)
@@ -124,5 +137,8 @@ export class Minion extends Phaser.GameObjects.Image {
         this.goalPoint = 1;
         this.setPosition(this.startPosition.x, this.startPosition.y)
         this.imageClone.copyPosition(this)
+        this.health = 100;
+        this.greenBar.setScale(this.health / this.maxHealth, 1)
+        this.body.setEnable(true)
     }
 }
